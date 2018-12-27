@@ -1,0 +1,92 @@
+SpringBootJavainuseSwaggerProfile
+
+SpringBootJavainuseSwagger2Helloworld(Spring Boot + Swagger2) is the input to this
+
+In a previous post we developed Spring Boot + Swagger2 documentation. In this post we add Spring profile to this implementation. Also we had previously implemented Spring Profiles using Spring MVC. Spring Profiles allows users to register beans depending on the profile(dev, test, prod etc). So when the application is running in DEVELOPMENT only certain beans can be loaded and when in PRODUCTION certain other beans can be loaded. Suppose our requirement is that the Swagger documentation be enabled only for the QA environment and disabled for all others. This can be done using Profiles. Spring Boot makes using Profiles very easy.
+
+We will define the Spring Profile for the Swagger implementation class SwaggerConfig such that it will get loaded only when the deployment is for QA else it will be disabled. For this in the application.properties file define the active profiles as follows-
+spring.profiles.active=swagger-disabled-for-qa
+
+and add @Profile("swagger-enabled-for-qa") in SwaggerConfig.java
+
+Test the application
+http://localhost:8080/api/hello
+Test swagger
+http://localhost:8080/swagger-ui.html
+
+Spring Boot + Profiles
+In a previous post we developed Spring Boot + Swagger2 documentation. In this post we add Spring profile to this implementation. Also we had previously implemented Spring Profiles using Spring MVC. Spring Profiles allows users to register beans depending on the profile(dev, test, prod etc). So when the application is running in DEVELOPMENT only certain beans can be loaded and when in PRODUCTION certain other beans can be loaded. Suppose our requirement is that the Swagger documentation be enabled only for the QA environment and disabled for all others. This can be done using Profiles. Spring Boot makes using Profiles very easy. 
+
+Video
+
+This tutorial is explained in the below Youtube Video.
+
+
+
+Lets Begin-
+
+So the Spring Boot Swagger project will be the starting point for this implementation.
+The project will be as follows- 
+Spring Boot Profile Tutorial
+
+ 
+We will define the Spring Profile for the Swagger implementation class SwaggerConfig such that it will get loaded only when the deployment is for QA else it will be disabled. For this in the application.properties file define the active profiles as follows-
+spring.profiles.active=swagger-disabled-for-qa 
+
+The SwaggerConfig class annoatate with the Profile tag as follows-
+package com.javainuse.swaggertest;
+
+import static com.google.common.base.Predicates.or;
+import static springfox.documentation.builders.PathSelectors.regex;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import com.google.common.base.Predicate;
+
+@Profile("swagger-enabled-for-qa")
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {
+
+	@Bean
+	public Docket postsApi() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName("public-api")
+				.apiInfo(apiInfo()).select().paths(postPaths()).build();
+	}
+
+	private Predicate postPaths() {
+		return or(regex("/api/posts.*"), regex("/api/javainuse.*"));
+	}
+
+	private ApiInfo apiInfo() {
+		return new ApiInfoBuilder().title("JavaInUse API")
+				.description("JavaInUse API reference for developers")
+				.termsOfServiceUrl("http://javainuse.com")
+				.contact("javainuse@gmail.com").license("JavaInUse License")
+				.licenseUrl("javainuse@gmail.com").version("1.0").build();
+	}
+
+}
+ 
+Currently if the application is deployed then the swagger will be disabled. Go to http://localhost:8080/swagger-ui.html.
+
+Spring Boot Profiles Example
+If the application is to be deployed in QA then change the profile in application.properties as follows-
+spring.profiles.active=swagger-enabled-for-qa 
+
+ 
+Now the swagger will be enabled after deployment. Go to http://localhost:8080/swagger-ui.html.
+
+Spring Boot Swagger Tutorial
+So using Spring Profiles we can enable or disable the loading of any bean.
+Download Source Code
+Download it -
+Spring Boot + Swagger + Profiles
